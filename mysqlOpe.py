@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import mysql.connector
+import mysql.connector, logging.config
 
 hostname = "localhost"
 user = "root"
@@ -10,6 +10,8 @@ database = "tfidfDB"
 connection = None #mySQL DB コネクション
 cur = None #mySQL DB カーソルオブジェクト
 
+#log設定
+logger = logging.getLogger()
 
 """
 MySQL DB 接続用モジュール
@@ -39,13 +41,14 @@ def dbClose():
 historyTableに存在して、tfidfTableに存在しないlinkを取得して、tfidfTableに登録する
 """
 def diffInsertTable():
+    logger.info("diffInsertTable is start")
     dbConnect()
 
     # historyTableに存在して tfidfTableに存在しないものを取得
     cur.execute("select historyTable.link from historyTable where not exists("
         "select tfidfTable.link from tfidfTable where historyTable.link = tfidfTable.link)")
     diffLinkList = cur.fetchall()
-    print(diffLinkList)
+    #print(diffLinkList)
 
     #tfidfTableに差分登録
     for linkDic in diffLinkList:
@@ -115,5 +118,7 @@ def getTitleAndCommentFromLink(link):
 
 if __name__ == "__main__":
     #diffInsertTable()
+    """
     table = getMargeTable()
     print(table)
+    """

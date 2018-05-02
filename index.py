@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import os
+import os, logging.config
 from bottle import route, run, view, static_file, request
 from bottle import TEMPLATE_PATH, jinja2_template as template
 
@@ -9,12 +9,15 @@ import mysqlOpe, tfidf
 #BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 #TEMPLATE_PATH.append(BASE_DIR + "/views")
 
-"""
-Topページ
-"""
+#log設定
+logging.config.fileConfig("logging.conf")
+logger = logging.getLogger()
+
+#選択画面
 @route('/like') #/likeのルーティング
 @view('like') #like.tplテンプレートを利用する
 def like():
+    logger.info('/like is accessed')
     #historyTable　と　tfidfTableの差分を更新する
     mysqlOpe.diffInsertTable()
 
@@ -22,19 +25,21 @@ def like():
     table = mysqlOpe.getMargeTable()
     return template("like", tables = table)
 
+#ランキング画面
 @route('/checked', method='POST')
 def checked():
+    logger.info('/checked is accessed')
+
+    logger.info('likeFlag of tfidfTable is update start')
     #選択されたlinkを取得
     checkLikeList = request.forms.getall("likeFlag")
-    print(checkLikeList)
-
     #選択された結果でlikeFlag更新
     mysqlOpe.setLikeFlag(checkLikeList)
 
     """
     TF-IDFの計算
     """
-
+    logger.info('TF-IDF calc start')
     # 全HistoryTableの{link, title+comment}　の配列を作成
     historyTable = mysqlOpe.getHistoryTable()
 
@@ -54,35 +59,37 @@ def checked():
         masterHistoryTableData.append(dic)
         masterLinkList.append(record["link"])
 
-    print(masterHistoryTableData)
+    #print(masterHistoryTableData)
 
-    #dataのみ抜き出したリストを作成
+    #title+commentのみ抜き出したリストを作成
     data = []
     for record in masterHistoryTableData:
         data.append(record["data"])
-    print(data)
+    #print(data)
 
     #全HistoryTableのTFIDF計算
+    logger.info('TF-IDF of historyTable calc start')
     outputDic = tfidf.tfidf(data)
 
     feature = outputDic["feature"]
-    print(feature)
-    print(len(feature))
+    #print(feature)
+    #print(len(feature))
     tfidfVec = outputDic["tfidfVec"]
-    print(tfidfVec.toarray())
+    #print(tfidfVec.toarray())
 
     #checkしたlinkの文書番号（配列番号）を取得
     linkNoList = []
     for link in checkLikeList:
         linkNoList.append(masterLinkList.index(link))
-    print(linkNoList)
+    #print(linkNoList)
 
     #全HistoryTableのTFIDFベクトルから、checkしたものだけスライス
+    logger.info('user Vector create start')
     userVec = []
     for no in linkNoList:
         userVec.append(tfidfVec[no,:])
     averageVec = tfidf.averageVecForCSCMatrix(userVec)
-    print(averageVec)
+    #print(averageVec)
 
     #ユーザ嗜好ベクトルの特徴語ランキング作成
     featureRanking = tfidf.rankFeature(averageVec, feature)[:50] #上位xx件でスライス
@@ -90,8 +97,11 @@ def checked():
     #    print(data[0] + ":" +data[1])
 
     #コサイン類似度算出
+    logger.info('cosine simuration calc start')
     sortedCosvalueList = tfidf.rankingCosSim(averageVec, tfidfVec)
+
     #おすすめランキングリスト
+    logger.info('ranking create start')
     ranking = []
     for key, value in sortedCosvalueList:
         #print(str(key) +" : " +str(value))
@@ -111,7 +121,12 @@ def checked():
 @route('/css/<filename:path>') #CSSルーティング
 def css(filename):
     #ルートパスを指定する
-    return static_file(filename, root="/vagrant_data/css")
+    return static_file(filename, root="/vagrant_data/tfidfRecommend/css")
+
+@route('/log') 
+def log():
+    #ルートパスを指定する
+    return static_file("tfidf.log", root="/vagrant_data/tfidfRecommend/")
 
 
 run(host='0.0.0.0', port=8080, debug=True)
