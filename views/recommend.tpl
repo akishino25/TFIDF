@@ -12,6 +12,10 @@
 <body>
     <div class="container">
         <h2>おすすめランキング</h2>
+        {% for data in featureRanking %}
+        {{data[0]}} : {{data[1]}}</br>
+        {% endfor %}
+
         <table class="table table-borderd">
             <tr class="info">
                 <td class="col-md-1">no</td>

@@ -116,7 +116,26 @@ def rankingCosSim(averageVec, tfidfVec):
 
     return sortedCosvalueList
 
+"""
+ユーザ嗜好ベクトルの中で、高い値を持つ順に特徴語をランキング
+[IN]averageVec : ユーザ嗜好ベクトル（1*nのベクトル）
+[IN]feature : 特徴語の配列
+[OUT]featureRanking : 第1要素に特徴語、第2要素にスコアを持つ要素のソート済リスト　[(feature, vecValue)]
+"""
+def rankFeature(averageVec, feature):
+    averageDic = {}
+    #ユーザ嗜好ベクトルをを配列にしてループ
+    for i, average in enumerate(averageVec.toarray()[0]):
+        #key=featureの番号、value=ベクトル値
+        averageDic[i] = average
 
+    #ベクトル値でソート
+    sortedAverageVec = sorted(averageDic.items(), key=lambda x: -x[1])
+    featureRanking = []
+    for vec in sortedAverageVec:
+        data = [feature[vec[0]], str(vec[1])]
+        featureRanking.append(data)
+    return featureRanking
 
 
 if __name__ == "__main__":
@@ -147,6 +166,10 @@ if __name__ == "__main__":
     #疎行列のベクトル平均
     vecList = [tfidfVec[0,:], tfidfVec[1,:], tfidfVec[2,:]]
     averageVec = averageVecForCSCMatrix(vecList)
+
+    featureRanking = rankFeature(averageVec, feature)
+    for data in featureRanking:
+        print(data[0] + ":" +data[1])
 
     #コサイン類似度算出
     sortedCosvalueList = rankingCosSim(averageVec, tfidfVec)

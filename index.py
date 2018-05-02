@@ -84,6 +84,11 @@ def checked():
     averageVec = tfidf.averageVecForCSCMatrix(userVec)
     print(averageVec)
 
+    #ユーザ嗜好ベクトルの特徴語ランキング作成
+    featureRanking = tfidf.rankFeature(averageVec, feature)[:50] #上位xx件でスライス
+    #for data in featureRanking:
+    #    print(data[0] + ":" +data[1])
+
     #コサイン類似度算出
     sortedCosvalueList = tfidf.rankingCosSim(averageVec, tfidfVec)
     #おすすめランキングリスト
@@ -96,12 +101,12 @@ def checked():
         tAndC = mysqlOpe.getTitleAndCommentFromLink(link)
         title = tAndC[0]["title"]
         comment = tAndC[0]["comment"]
-        print(str(key) +" : " +link +" : " +title +" : " +comment + " : " +str(value))
+        #print(str(key) +" : " +link +" : " +title +" : " +comment + " : " +str(value))
 
         rankData = {"no":str(key), "score":str(round(value,3)), "link":link, "title":title, "comment":comment}
         ranking.append(rankData)
 
-    return template("recommend", ranking = ranking)
+    return template("recommend", featureRanking = featureRanking, ranking = ranking)
 
 @route('/css/<filename:path>') #CSSルーティング
 def css(filename):
