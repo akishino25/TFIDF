@@ -15,13 +15,42 @@ http://[IPアドレス]:8080/like
 tfidf.log : ソースコード中に記述しているログ　（http://[IPアドレス]:8080/log　で確認できる）
 server.log : 標準出力に表示されるものをパイプしているログ
 
+# Ubuntu移植
+## python, pipインストール
+$sudo add-apt-repository ppa:deadsnakes/ppa
+$sudo apt-get update
+$sudo apt-get install python3.6 python3.6-dev
+$mkdir -p $HOME/bin
+$ln -s /usr/bin/python3.6 $HOME/bin/python
+$sudo vi .bash_profile
+---
+export PATH=$HOME/bin:$PATH
+---
+## pipモジュールインストール
+$sudo python3 -m pip install --upgrade pip
+$sudo pip3 install numpy scipy scikit-learn
+## mecab関係インストール
+$sudo apt-get install mecab libmecab-dev mecab-ipadic mecab-ipadic-utf8
+$sudo pip3 install mecab-python3
+## bottle関係インストール
+$sudo pip3 install bottle==0.12.12
+$sudo pip3 install jinja2
+## mysql関係インストール　　※centOSとUbuntuでインストールするものが異なるので注意
+$sudo apt-get install python3-mysql.connector
+## mysqlにTable作成
+$mysql -u root -p
+>>use sharedb;
+>>create table tfidfTable(link varchar(20), likeflag tinyint(1))
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| link     | varchar(20) | YES  |     | NULL    |       |
+| likeflag | tinyint(1)  | YES  |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+
+
 # TODO
-
-・本番機移植 -> ubuntus
-
-・自分用Readmeを作成（後で分かるように)
-　→pipで何をインストールしたかとか
-　→MySQLのコマンドとか
+・自分用Readme拡充　※簡単なシーケンスとか
 
 ・エラーハンドリングを一切やってない
 

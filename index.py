@@ -121,12 +121,14 @@ def checked():
 @route('/css/<filename:path>') #CSSルーティング
 def css(filename):
     #ルートパスを指定する
-    return static_file(filename, root="/vagrant_data/tfidfRecommend/css")
+    #return static_file(filename, root="/vagrant_data/tfidfRecommend/css") #vagrant ver
+    return static_file(filename, root="/vagrant_data/tfidfRecommend/css") #ubuntu ver
 
 @route('/log') 
 def log():
     #ルートパスを指定する
-    return static_file("tfidf.log", root="/vagrant_data/tfidfRecommend/")
+    #return static_file("tfidf.log", root="/vagrant_data/tfidfRecommend/") #vagrant ver
+    return static_file("tfidf.log", root="/vagrant_data/tfidfRecommend/") #ubuntu ver
 
 
 run(host='0.0.0.0', port=8080, debug=True)

@@ -2,10 +2,19 @@
 
 import mysql.connector, logging.config
 
+#vagrant(centos)#
+"""
 hostname = "localhost"
 user = "root"
 password = "Root@123"
 database = "tfidfDB"
+"""
+
+#vagrant(centos)#
+hostname = "localhost"
+user = "user1"
+password = "user1!!"
+database = "sharedb"
 
 connection = None #mySQL DB コネクション
 cur = None #mySQL DB カーソルオブジェクト
