@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import os, logging.config
+import os, configparser, logging.config
 from bottle import route, run, view, static_file, request
 from bottle import TEMPLATE_PATH, jinja2_template as template
 
@@ -12,6 +12,15 @@ import mysqlOpe, tfidf
 #log設定
 logging.config.fileConfig("logging.conf")
 logger = logging.getLogger()
+
+# config読み込み
+config = configparser.SafeConfigParser()
+try:
+    config.read("tfidf.conf")
+    rootPath = config.get("path", "rootPath")
+except:
+    logger.error("config open failed!!")
+    exit()
 
 #選択画面
 @route('/like') #/likeのルーティング
@@ -121,14 +130,15 @@ def checked():
 @route('/css/<filename:path>') #CSSルーティング
 def css(filename):
     #ルートパスを指定する
+    cssPath = rootPath + "css"
+    return static_file(filename, root= cssPath)
     #return static_file(filename, root="/vagrant_data/tfidfRecommend/css") #vagrant ver
-    return static_file(filename, root="/vagrant_data/tfidfRecommend/css") #ubuntu ver
 
 @route('/log') 
 def log():
     #ルートパスを指定する
-    #return static_file("tfidf.log", root="/vagrant_data/tfidfRecommend/") #vagrant ver
-    return static_file("tfidf.log", root="/vagrant_data/tfidfRecommend/") #ubuntu ver
+    return static_file("tfidf.log", root= rootPath) #vagrant ver
+    #return static_file("tfidf.log", root="/vagrant_data/tfidfRecommend/") #ubuntu ver
 
 
 run(host='0.0.0.0', port=8080, debug=True)

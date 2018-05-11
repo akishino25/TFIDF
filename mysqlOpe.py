@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import mysql.connector, logging.config
+import mysql.connector, configparser, logging.config
 
 #vagrant(centos)#
 """
@@ -9,18 +9,33 @@ user = "root"
 password = "Root@123"
 database = "tfidfDB"
 """
-
 #vagrant(centos)#
+"""
 hostname = "localhost"
 user = "user1"
 password = "user1!!"
 database = "sharedb"
+"""
 
 connection = None #mySQL DB コネクション
 cur = None #mySQL DB カーソルオブジェクト
 
 #log設定
 logger = logging.getLogger()
+
+# config読み込み
+config = configparser.SafeConfigParser()
+try:
+    config.read("tfidf.conf")
+
+    hostname = config.get("mysql", "hostname")
+    user = config.get("mysql", "user")
+    password = config.get("mysql", "password")
+    database = config.get("mysql", "database")
+except:
+    logger.error("config open failed!!")
+    exit()
+
 
 """
 MySQL DB 接続用モジュール
