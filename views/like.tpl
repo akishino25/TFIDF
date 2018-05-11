@@ -36,7 +36,13 @@
                 </tr>
                 {% endfor %}
             </table>
-        <input type="submit" value="送信">
+        <select name="outputRange" class="form-control">
+            <option value="25">最新の25件</option>>
+            <option value="50">最新の50件</option>>
+            <option value="100">最新の100件</option>>
+            <option value="all">全件</option>>
+        </select>
+        <input type="submit" class="btn btn-default" value="送信">
         </form>
     </div>
 </body>

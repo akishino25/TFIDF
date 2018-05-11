@@ -105,9 +105,30 @@ def checked():
     #for data in featureRanking:
     #    print(data[0] + ":" +data[1])
 
+    #選択された解析対象範囲を取得
+    outputRange = request.forms.getall("outputRange")[0]
+    print(outputRange)
+    print(type(outputRange))
+
+    #選択範囲が全件（all）以外の場合には、最新のｘｘ件をスライス
+    if(outputRange=="all"):
+        cutUpper = 0
+        selectTfidfVec = tfidfVec
+
+    else:
+        # スライスする件数を算出
+        cutUpper = len(masterLinkList) - int(outputRange)
+        print("cutUpper:" +str(cutUpper))
+        #ベクトルの下からｘｘ件をスライス（下が最新のデータなので）
+        selectTfidfVec = tfidfVec[cutUpper:,:]
+        print("tfidfVec shape:" +str(tfidfVec.shape))
+        print("selectVec shape:" +str(selectTfidfVec.shape))
+
+
     #コサイン類似度算出
     logger.info('cosine simuration calc start')
-    sortedCosvalueList = tfidf.rankingCosSim(averageVec, tfidfVec)
+    #sortedCosvalueList = tfidf.rankingCosSim(averageVec, tfidfVec)
+    sortedCosvalueList = tfidf.rankingCosSim(averageVec, selectTfidfVec)
 
     #おすすめランキングリスト
     logger.info('ranking create start')
@@ -115,14 +136,15 @@ def checked():
     for key, value in sortedCosvalueList:
         #print(str(key) +" : " +str(value))
         #key(文書番号)からlinkを逆引き
-        link = masterLinkList[key]
+        #全体400件で最新の100件を選択した場合、切り取ったベクトルの1件目は301件目となる
+        link = masterLinkList[key+cutUpper] 
         #linkからtitleとcommentを取得
         tAndC = mysqlOpe.getTitleAndCommentFromLink(link)
         title = tAndC[0]["title"]
         comment = tAndC[0]["comment"]
         #print(str(key) +" : " +link +" : " +title +" : " +comment + " : " +str(value))
 
-        rankData = {"no":str(key), "score":str(round(value,3)), "link":link, "title":title, "comment":comment}
+        rankData = {"no":str(key+cutUpper), "score":str(round(value,3)), "link":link, "title":title, "comment":comment}
         ranking.append(rankData)
 
     return template("recommend", featureRanking = featureRanking, ranking = ranking)

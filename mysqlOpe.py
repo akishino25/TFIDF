@@ -9,7 +9,7 @@ user = "root"
 password = "Root@123"
 database = "tfidfDB"
 """
-#vagrant(centos)#
+#vagrant(ubuntu)#
 """
 hostname = "localhost"
 user = "user1"
@@ -33,7 +33,7 @@ try:
     password = config.get("mysql", "password")
     database = config.get("mysql", "database")
 except:
-    logger.error("config open failed!!")
+    logger.error("config open failed!!!")
     exit()
 
 

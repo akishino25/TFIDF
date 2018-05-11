@@ -101,7 +101,7 @@ def averageVecForCSCMatrix(vecList):
 ユーザ嗜好ベクトル（averageVec）と、文書毎のTFIDFのベクトルのコサイン類似度を算出
 [IN]averageVec : ユーザ嗜好ベクトル、ユーザの好みを表すベクトル
 [IN]tfidfVec : 文書毎のTFIDFのベクトル集合
-[OUT]sortedCosvalueList : (key:文書ID, value:コサイン類似度)　の要素の配列
+[OUT]sortedCosvalueList : (key:文書番号, value:コサイン類似度)　の要素の配列
 """
 def rankingCosSim(averageVec, tfidfVec):
     rankDic = {}
